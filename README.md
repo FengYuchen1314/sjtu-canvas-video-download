@@ -55,14 +55,32 @@ npm run dev
 ### 构建
 
 ```sh
-npm run build      # 编译
-npm run dist:win   # 打包 Windows 安装包
+npm run build       # 编译
+npm run dist:win    # Windows（exe 安装包 + 便携版）
+npm run dist:linux  # Linux（deb）
+npm run dist:mac    # macOS（dmg）
 ```
 
-打包产物位于 `release/` 目录：
+本地打包产物位于 `release/` 目录。
 
-- `SJTU Canvas 视频下载器 Setup 2.0.0.exe` — NSIS 安装程序
-- `SJTU Canvas 视频下载器 2.0.0.exe` — 便携版（免安装）
+### 自动发布（GitHub Actions）
+
+推送 `v*` 标签后，会自动在 Windows / Linux / macOS 三端构建并创建 GitHub Release：
+
+```sh
+git tag v2.0.0
+git push origin v2.0.0
+```
+
+也可在 GitHub 仓库 **Actions → Release → Run workflow** 手动触发。
+
+Release 附件包含：
+
+| 平台 | 格式 |
+|------|------|
+| Windows | `.exe` 安装程序 + 便携版 |
+| Linux | `.deb` |
+| macOS | `.dmg` |
 
 ### 使用说明
 
