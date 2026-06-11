@@ -56,7 +56,7 @@ npm run dev
 
 ```sh
 npm run build       # 编译
-npm run dist:win    # Windows（exe 安装包 + 便携版）
+npm run dist:win    # Windows（exe 安装包）
 npm run dist:linux  # Linux（deb）
 npm run dist:mac    # macOS（dmg）
 ```
@@ -78,7 +78,7 @@ Release 附件包含：
 
 | 平台 | 格式 |
 |------|------|
-| Windows | `.exe` 安装程序 + 便携版 |
+| Windows | `.exe` 安装程序 |
 | Linux | `.deb` |
 | macOS | `.dmg` |
 
