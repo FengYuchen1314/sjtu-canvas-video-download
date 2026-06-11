@@ -1,6 +1,6 @@
 {
   "name": "sjtu-canvas-video-download",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "SJTU Canvas 视频批量下载器 (Electron)",
   "main": "out/main/index.js",
   "author": "FengYuchen1314",
