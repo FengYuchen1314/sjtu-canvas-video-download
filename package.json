@@ -1,0 +1,72 @@
+{
+  "name": "sjtu-canvas-video-download",
+  "version": "2.0.0",
+  "description": "SJTU Canvas 视频批量下载器 (Electron)",
+  "main": "out/main/index.js",
+  "author": "FengYuchen1314",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FengYuchen1314/sjtu-canvas-video-download.git"
+  },
+  "homepage": "https://github.com/FengYuchen1314/sjtu-canvas-video-download#readme",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "dist": "electron-vite build && electron-builder",
+    "dist:win": "electron-vite build && electron-builder --win"
+  },
+  "dependencies": {
+    "axios": "^1.7.9",
+    "cheerio": "^1.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tough-cookie": "^5.0.0",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@types/ws": "^8.5.13",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.5.0",
+    "clsx": "^2.1.1",
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8",
+    "electron-vite": "^2.3.0",
+    "postcss": "^8.5.15",
+    "tailwind-merge": "^3.6.0",
+    "tailwindcss": "^3.4.19",
+    "typescript": "^5.7.2",
+    "vite": "^5.4.11"
+  },
+  "build": {
+    "appId": "cn.sjtu.canvas.video.download",
+    "productName": "SJTU Canvas 视频下载器",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "out/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        },
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}

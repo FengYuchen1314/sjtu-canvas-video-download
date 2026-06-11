@@ -1,0 +1,12 @@
+本仓库为以下项目的二次开发（Derivative Work）：
+
+  SJTU Canvas 视频 (批量) 下载器
+  https://github.com/prcwcy/sjtu-canvas-video-download
+
+原项目由 prcwcy 等人创建并维护。原仓库未在 GitHub 上附带正式 LICENSE 文件；
+本二次开发版本在 MIT 协议下发布，并在此对原作者及贡献者表示感谢。
+
+核心业务逻辑（jAccount 登录、Canvas 课程列表获取、LTI 鉴权、视频下载流程等）
+均移植自上述原项目，实现语言由 Python 迁移至 TypeScript。
+
+原项目贡献者（据 GitHub 记录）包括但不限于：prcwcy、Admin-AAA、SY-LG、leoyinhaiqing。
