@@ -9,9 +9,22 @@ export function getCourseFilenameExt(courseLink: string): string {
   return courseLink.slice(leftIndex, rightIndex >= 0 ? rightIndex : undefined)
 }
 
+import type { DownloadMode } from '../types'
+
+function shouldIncludeVideo(cdviViewNum: number, mode: DownloadMode): boolean {
+  switch (mode) {
+    case 'camera':
+      return cdviViewNum === 0
+    case 'screen':
+      return cdviViewNum !== 0
+    case 'all':
+      return true
+  }
+}
+
 export function buildDownloadFilenames(
   courses: { subjName: string; userName: string; courName: string; videoPlayResponseVoList: { cdviViewNum: number; rtmpUrlHdv: string }[] }[][],
-  partialOnly: boolean
+  mode: DownloadMode
 ): { links: string[]; filenames: string[] } {
   const links: string[] = []
   const filenames: string[] = []
@@ -28,15 +41,16 @@ export function buildDownloadFilenames(
       const courseDirname = `${subjectName}_${teacherName}`
 
       sortedVideos.forEach((video, i) => {
-        if (!partialOnly || video.cdviViewNum === 0) {
-          const courseLink = video.rtmpUrlHdv
-          const ext = getCourseFilenameExt(courseLink)
-          const filename = partialOnly
-            ? `${courseDirname}/${courseFilenameRaw}${ext}`
-            : `${courseDirname}/${courseFilenameRaw}_${i}${ext}`
-          links.push(courseLink)
-          filenames.push(filename)
-        }
+        if (!shouldIncludeVideo(video.cdviViewNum, mode)) return
+
+        const courseLink = video.rtmpUrlHdv
+        const ext = getCourseFilenameExt(courseLink)
+        const filename =
+          mode === 'all'
+            ? `${courseDirname}/${courseFilenameRaw}_${i}${ext}`
+            : `${courseDirname}/${courseFilenameRaw}${ext}`
+        links.push(courseLink)
+        filenames.push(filename)
       })
     }
   }

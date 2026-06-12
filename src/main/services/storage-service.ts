@@ -28,7 +28,12 @@ function writeJson(filename: string, data: unknown): void {
 }
 
 export function loadConfig(): AppConfig {
-  return { ...DEFAULT_CONFIG, ...readJson<Partial<AppConfig>>('config.json', {}) }
+  const raw = readJson<Partial<AppConfig> & { partialDownloadOnly?: boolean }>('config.json', {})
+  const config = { ...DEFAULT_CONFIG, ...raw }
+  if (!raw.downloadMode && 'partialDownloadOnly' in raw) {
+    config.downloadMode = raw.partialDownloadOnly ? 'camera' : 'all'
+  }
+  return config
 }
 
 export function saveConfig(config: AppConfig): void {

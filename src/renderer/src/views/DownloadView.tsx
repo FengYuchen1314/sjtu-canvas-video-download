@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import type { AppConfig, CourseInfo, DownloadBatchState } from '@shared/types'
+import type { AppConfig, CourseInfo, DownloadBatchState, DownloadMode } from '@shared/types'
 import PageHeader from '../components/PageHeader'
 import BlurDecor from '../components/ui/BlurDecor'
 import Button from '../components/ui/Button'
@@ -12,7 +12,7 @@ interface DownloadViewProps {
   config: AppConfig | null
   downloadState: DownloadBatchState | null
   activeBatchId: string | null
-  onStartDownload: (courses: CourseInfo[][], outputDir: string, partialOnly: boolean) => void
+  onStartDownload: (courses: CourseInfo[][], outputDir: string, downloadMode: DownloadMode) => void
   onCancelBatch: (batchId: string) => void
   onConfigChange: (partial: Partial<AppConfig>) => void
 }
@@ -27,6 +27,12 @@ function formatBytes(bytes: number): string {
 function formatSpeed(speed: number): string {
   return `${formatBytes(speed)}/s`
 }
+
+const downloadModeOptions: { value: DownloadMode; label: string }[] = [
+  { value: 'camera', label: '仅下载摄像头' },
+  { value: 'screen', label: '仅下载屏幕' },
+  { value: 'all', label: '下载全部' }
+]
 
 const statusTone = {
   pending: 'default',
@@ -59,7 +65,7 @@ export default function DownloadView({
   const [upperIndex, setUpperIndex] = useState(0)
   const [singleCourseIndex, setSingleCourseIndex] = useState(0)
   const [outputDir, setOutputDir] = useState(config?.lastSaveDir ?? '')
-  const [partialOnly, setPartialOnly] = useState(config?.partialDownloadOnly ?? false)
+  const [downloadMode, setDownloadMode] = useState<DownloadMode>(config?.downloadMode ?? 'all')
   const [starting, setStarting] = useState(false)
 
   const subjectNames = useMemo(
@@ -97,8 +103,8 @@ export default function DownloadView({
     if (!outputDir) return
     setStarting(true)
     try {
-      onConfigChange({ partialDownloadOnly: partialOnly })
-      await onStartDownload(selectedCourses, outputDir, partialOnly)
+      onConfigChange({ downloadMode })
+      await onStartDownload(selectedCourses, outputDir, downloadMode)
     } finally {
       setStarting(false)
     }
@@ -186,10 +192,24 @@ export default function DownloadView({
               </div>
             </div>
 
-            <label className="mt-4 flex items-center gap-2 text-sm text-md-on-surface-variant">
-              <input type="checkbox" checked={partialOnly} onChange={(e) => setPartialOnly(e.target.checked)} className="accent-md-primary" />
-              只下载录像（不下载录屏）
-            </label>
+            <div className="mt-4">
+              <span className="mb-2 block text-sm font-medium text-md-on-surface-variant">下载内容</span>
+              <div className="flex flex-wrap gap-4">
+                {downloadModeOptions.map(({ value, label }) => (
+                  <label key={value} className="flex items-center gap-2 text-sm text-md-on-surface-variant">
+                    <input
+                      type="radio"
+                      name="downloadMode"
+                      value={value}
+                      checked={downloadMode === value}
+                      onChange={() => setDownloadMode(value)}
+                      className="accent-md-primary"
+                    />
+                    {label}
+                  </label>
+                ))}
+              </div>
+            </div>
 
             <Button className="mt-6" onClick={handleDownload} disabled={!outputDir || starting || !selectedCourses[0]?.length}>
               {starting ? '启动中...' : '开始下载'}

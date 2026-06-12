@@ -7,7 +7,7 @@ export const DEFAULT_CONFIG = {
   username: '',
   rememberUsername: true,
   downloadConcurrency: 4,
-  partialDownloadOnly: false,
+  downloadMode: 'all' as const,
   lastSaveDir: ''
 } as const
 

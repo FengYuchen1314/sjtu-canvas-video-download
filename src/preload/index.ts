@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import type { AppConfig, CourseInfo, DownloadBatchState, FetchProgress, HistoryEntry } from '../shared/types'
+import type { AppConfig, CourseInfo, DownloadBatchState, DownloadMode, FetchProgress, HistoryEntry } from '../shared/types'
 
 const api = {
   auth: {
@@ -34,7 +34,7 @@ const api = {
     }
   },
   courses: {
-    fetchAll: (payload: { useCourseId: boolean; courseId?: string }): Promise<{
+    fetchAll: (payload: { courseId: string }): Promise<{
       courses: CourseInfo[][]
       numSubject: number
       numCourse: number
@@ -53,7 +53,7 @@ const api = {
       courses: CourseInfo[][]
       outputDir: string
       concurrency: number
-      partialOnly: boolean
+      downloadMode: DownloadMode
       recordHistory: boolean
     }): Promise<{ batchId: string; total: number }> => ipcRenderer.invoke('download:start', payload),
     cancel: (batchId: string) => ipcRenderer.invoke('download:cancel', batchId),

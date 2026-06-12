@@ -12,7 +12,7 @@ interface CoursesViewProps {
   courses: CourseInfo[][]
   fetching: boolean
   fetchProgress: FetchProgress | null
-  onFetch: (useCourseId: boolean, courseId?: string) => void
+  onFetch: (courseId: string) => void
   onImport: () => void
   onExport: () => void
   onGoDownload: () => void
@@ -29,7 +29,6 @@ export default function CoursesView({
   onGoDownload,
   loggedIn
 }: CoursesViewProps) {
-  const [useCourseId, setUseCourseId] = useState(false)
   const [courseId, setCourseId] = useState('')
   const [expandedSubject, setExpandedSubject] = useState<number | null>(0)
 
@@ -45,7 +44,7 @@ export default function CoursesView({
 
       <PageHeader
         title="课程列表"
-        subtitle="从 Canvas 获取视频课程信息，或导入之前保存的 JSON 文件。"
+        subtitle="输入 Canvas 课号获取视频课程信息，或导入之前保存的 JSON 文件。"
         badges={[
           { label: `${courses.length} 科目`, tone: 'primary' },
           { label: `${totalLectures} 讲`, tone: 'default' }
@@ -60,34 +59,24 @@ export default function CoursesView({
 
       <Card elevated className="mb-6">
         <CardTitle>获取课程</CardTitle>
-        <CardSubtitle>支持全量刷新或按 Canvas 课程 ID 获取</CardSubtitle>
+        <CardSubtitle>请输入 Canvas 课号进行查询</CardSubtitle>
 
-        <label className="mb-4 flex items-center gap-2 text-sm text-md-on-surface-variant">
-          <input
-            type="checkbox"
-            checked={useCourseId}
-            onChange={(e) => setUseCourseId(e.target.checked)}
-            disabled={!loggedIn}
-            className="accent-md-primary"
+        <div className="mb-4 max-w-xs">
+          <Input
+            label="课号"
+            placeholder="例如 12345"
+            value={courseId}
+            onChange={(e) => setCourseId(e.target.value)}
+            disabled={!loggedIn || fetching}
           />
-          使用 Canvas 课程 ID
-        </label>
-
-        {useCourseId && (
-          <div className="mb-4 max-w-xs">
-            <Input
-              label="课程 ID"
-              placeholder="例如 12345"
-              value={courseId}
-              onChange={(e) => setCourseId(e.target.value)}
-              disabled={!loggedIn}
-            />
-          </div>
-        )}
+        </div>
 
         <div className="flex flex-wrap gap-3">
-          <Button disabled={!loggedIn || fetching} onClick={() => onFetch(useCourseId, courseId)}>
-            {fetching ? '获取中...' : '刷新课程列表'}
+          <Button
+            disabled={!loggedIn || fetching || !courseId.trim()}
+            onClick={() => onFetch(courseId.trim())}
+          >
+            {fetching ? '查询中...' : '查询课程'}
           </Button>
           <Button variant="tonal" onClick={onImport}>导入 JSON</Button>
           <Button variant="tonal" onClick={onExport} disabled={!courses.length}>导出 JSON</Button>
@@ -116,7 +105,7 @@ export default function CoursesView({
       <Card interactive elevated>
         <CardTitle>已加载课程</CardTitle>
         {courses.length === 0 ? (
-          <p className="text-sm text-md-on-surface-variant">暂无课程数据，请先登录并刷新课程列表。</p>
+          <p className="text-sm text-md-on-surface-variant">暂无课程数据，请先登录并按课号查询课程。</p>
         ) : (
           <div className="space-y-2">
             {courses.map((subject, si) => (

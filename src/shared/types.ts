@@ -48,11 +48,13 @@ export interface HistoryEntry {
   videoDirname: string
 }
 
+export type DownloadMode = 'camera' | 'screen' | 'all'
+
 export interface AppConfig {
   username: string
   rememberUsername: boolean
   downloadConcurrency: number
-  partialDownloadOnly: boolean
+  downloadMode: DownloadMode
   lastSaveDir: string
 }
 
@@ -85,7 +87,7 @@ export type IpcChannels = {
   }
   'auth:qr-start': { url: string }
   'auth:qr-refresh': void
-  'courses:fetch-all': { useCourseId: boolean; courseId?: string }
+  'courses:fetch-all': { courseId: string }
   'courses:import': { filePath: string }
   'courses:export': { filePath: string }
   'download:start': {

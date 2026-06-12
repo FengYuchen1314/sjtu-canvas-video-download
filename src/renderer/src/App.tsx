@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import type { AppConfig, CourseInfo, DownloadBatchState, FetchProgress, HistoryEntry } from '@shared/types'
+import type { AppConfig, CourseInfo, DownloadBatchState, DownloadMode, FetchProgress, HistoryEntry } from '@shared/types'
 import NavigationRail from './components/NavigationRail'
 import BlurDecor from './components/ui/BlurDecor'
 import LoginView from './views/LoginView'
@@ -68,11 +68,11 @@ export default function App() {
     setView('login')
   }
 
-  const handleFetchCourses = async (useCourseId: boolean, courseId?: string) => {
+  const handleFetchCourses = async (courseId: string) => {
     setFetching(true)
-    setFetchProgress({ phase: 'oauth', message: '开始获取课程...' })
+    setFetchProgress({ phase: 'oauth', message: '开始查询课程...' })
     try {
-      const result = await window.api.courses.fetchAll({ useCourseId, courseId })
+      const result = await window.api.courses.fetchAll({ courseId })
       setCourses(result.courses)
     } catch (e) {
       setFetchProgress({
@@ -100,14 +100,14 @@ export default function App() {
   const handleStartDownload = async (
     selectedCourses: CourseInfo[][],
     outputDir: string,
-    partialOnly: boolean
+    downloadMode: DownloadMode
   ) => {
     if (!config) return
     const result = await window.api.download.start({
       courses: selectedCourses,
       outputDir,
       concurrency: config.downloadConcurrency,
-      partialOnly,
+      downloadMode,
       recordHistory: true
     })
     setActiveBatchId(result.batchId)

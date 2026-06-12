@@ -12,8 +12,8 @@ import {
   completeCanvasLogin,
   completeQrLogin
 } from '../../shared/api/login-api'
-import { fetchAllCourses } from '../../shared/api/canvas-api'
 import { fetchCoursesByCanvasId } from '../../shared/api/canvas-v2-api'
+import type { DownloadMode } from '../../shared/types'
 import { downloadManager } from '../services/download-manager'
 import {
   loadConfig,
@@ -118,36 +118,27 @@ export function registerIpcHandlers(): void {
     return { success: true }
   })
 
-  ipcMain.handle(
-    'courses:fetch-all',
-    async (_, payload: { useCourseId: boolean; courseId?: string }) => {
-      const jar = getSessionJar()
-      const win = getMainWindow()
+  ipcMain.handle('courses:fetch-all', async (_, payload: { courseId: string }) => {
+    const courseId = payload.courseId?.trim()
+    if (!courseId) throw new Error('请输入课号')
 
-      const sendProgress = (progress: unknown) => {
-        win?.webContents.send('courses:fetch-progress', progress)
-      }
+    const jar = getSessionJar()
+    const win = getMainWindow()
 
-      if (payload.useCourseId) {
-        if (!payload.courseId?.trim()) throw new Error('请输入课程 ID')
-        saveSessionJar(jar)
-        cachedCourses = await fetchCoursesByCanvasId(jar, payload.courseId.trim(), (current, total) => {
-          sendProgress({
-            phase: 'details',
-            message: `加载课程详情 ${current}/${total}`,
-            current,
-            total
-          })
-        })
-      } else {
-        cachedCourses = await fetchAllCourses(jar, sendProgress)
-      }
+    saveSessionJar(jar)
+    cachedCourses = await fetchCoursesByCanvasId(jar, courseId, (current, total) => {
+      win?.webContents.send('courses:fetch-progress', {
+        phase: 'details',
+        message: `加载课程详情 ${current}/${total}`,
+        current,
+        total
+      })
+    })
 
-      const numSubject = cachedCourses.length
-      const numCourse = cachedCourses.reduce((sum, s) => sum + s.length, 0)
-      return { courses: cachedCourses, numSubject, numCourse }
-    }
-  )
+    const numSubject = cachedCourses.length
+    const numCourse = cachedCourses.reduce((sum, s) => sum + s.length, 0)
+    return { courses: cachedCourses, numSubject, numCourse }
+  })
 
   ipcMain.handle('courses:get-cached', () => cachedCourses)
 
@@ -172,11 +163,11 @@ export function registerIpcHandlers(): void {
         courses: CourseInfo[][]
         outputDir: string
         concurrency: number
-        partialOnly: boolean
+        downloadMode: DownloadMode
         recordHistory: boolean
       }
     ) => {
-      const { links, filenames } = buildDownloadFilenames(payload.courses, payload.partialOnly)
+      const { links, filenames } = buildDownloadFilenames(payload.courses, payload.downloadMode)
       if (!links.length) throw new Error('没有可下载的视频')
 
       if (payload.recordHistory) {
